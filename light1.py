@@ -9,6 +9,7 @@ import time
 from neopixel import *
 import argparse
 from gpiozero import Button
+#import keyboard
 
 button_0 = Button(5)
 button_1 = Button(6)
@@ -22,7 +23,7 @@ button_7 = Button(20)
 button_8 = Button(21)
 
 # LED strip configuration:
-LED_COUNT      = 299      # Number of LED pixels.
+LED_COUNT      = 331      # Number of LED pixels.
 LED_PIN        = 18      # GPIO pin connected to the pixels (18 uses PWM!).
 #LED_PIN        = 10      # GPIO pin connected to the pixels (10 uses SPI /dev/spidev0.0).
 LED_FREQ_HZ    = 800000  # LED signal frequency in hertz (usually 800khz)
@@ -31,6 +32,9 @@ LED_BRIGHTNESS = 255     # Set to 0 for darkest and 255 for brightest
 LED_INVERT     = False   # True to invert the signal (when using NPN transistor level shift)
 LED_CHANNEL    = 0       # set to '1' for GPIOs 13, 19, 41, 45 or 53
 
+LED_AMPDRAW    = 0.06 #led amp draw
+PS_AMPS        = 3 #amps supplied by power supply
+PWR_MULT       = PS_AMPS/(LED_AMPDRAW*LED_COUNT)
 
 
 # Define functions which animate LEDs in various ways.
@@ -90,6 +94,11 @@ def theaterChaseRainbow(strip, wait_ms=50):
             for i in range(0, strip.numPixels(), 3):
                 strip.setPixelColor(i+q, 0)
 
+#------------------
+'''keyboard.add_hotkey("p", lambda: temp())
+
+def temp():
+    print("PRESSED")'''
 # Main program logic follows:
 if __name__ == '__main__':
     # Process arguments
@@ -109,20 +118,25 @@ if __name__ == '__main__':
     try:
 
         while True:
+            '''if keyboard.is_pressed('p'):
+                print("yes")'''
+
             '''if button_2.is_pressed or button_3.is_pressed or button_4.is_pressed:
                 colorWipe(strip, Color(90, 0, 0))  # Red wipe'''
+
             print ('Color wipe animations.')
-            colorWipe(strip, Color(255, 0, 0),2)  # Red wipe
-            colorWipe(strip, Color(0, 255, 0),10)  # Blue wipe
-            colorWipe(strip, Color(0, 0, 255))  # Green wipe
+            colorWipe(strip, Color(int(255*PWR_MULT), 0, 0),2)  # Red wipe
+            colorWipe(strip, Color(0, int(255*PWR_MULT), 0),10)  # Blue wipe
+            colorWipe(strip, Color(0, 0, int(255*PWR_MULT)))  # Green wipe
             print ('Theater chase animations.')
-            theaterChase(strip, Color(127, 127, 127))  # White theater chase
-            theaterChase(strip, Color(127,   0,   0))  # Red theater chase
-            theaterChase(strip, Color(  0,   0, 127))  # Blue theater chase
-            print ('Rainbow animations.')
-            rainbow(strip)
-            rainbowCycle(strip)
-            theaterChaseRainbow(strip)
+            theaterChase(strip, Color(int(127*PWR_MULT), int(127*PWR_MULT), int(127*PWR_MULT)))  # White theater chase
+            theaterChase(strip, Color(int(127*PWR_MULT),   0,   0))  # Red theater chase
+            theaterChase(strip, Color(  0,   0, int(127*PWR_MULT)))  # Blue theater chase
+            #print ('Rainbow animations.')
+            #rainbow(strip)
+            #rainbowCycle(strip)
+            #theaterChaseRainbow(strip)
+            
 
     except KeyboardInterrupt:
         if args.clear:
